@@ -1,6 +1,8 @@
 """Experimenting with decorators."""
 
 import datetime
+import inspect
+from pdb import set_trace
 # import timeit
 
 
@@ -28,13 +30,24 @@ def class_timer(cls):
       # Not to mess up lookups for this class.
       # Sure this won't trigger recursion?
       # if hasattr(super(NewClass, self).__getattribute__(attr)
-      if hasattr(super(NewClass, self), attr):
-        return super(NewClass, self).__getattribute__(attr)
+      # if hasattr(super(NewClass, self), attr):
+      #   return super(NewClass, self).__getattribute__(attr)
+      try:
+        target = super(NewClass, self).__getattribute__(attr)
+      except AttributeError:
+        pass
+      else:
+        return target
 
-      target = self.original_obj.__getattribute__(attr)
-      if type(target) == type(self.__init__):
+      # target = self.original_obj.__getattribute__(attr)
+      target = getattr(self.original_obj, attr)
+
+      if inspect.ismethod(target):
         return time_it(target)
       return target
 
   return NewClass
 
+
+if __name__ == '__main__':
+  set_trace()
