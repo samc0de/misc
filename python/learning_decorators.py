@@ -68,7 +68,7 @@ class MathSubSub(Math):
     print 'Inside MathAnother.__init__.'
     self._args = args
     self._kwargs = kwargs
-    super(MathAnother, self).__init__(*args, **kwargs)
+    super(MathSubSub, self).__init__(*args, **kwargs)
   def sub(self, first, second):
     return first - second
 
@@ -106,7 +106,6 @@ def class_timer_another(cls):
 
   return NewClass
 
-
 @class_timer_another
 class MathAnother(object):
   def __init__(self):
@@ -119,16 +118,59 @@ class MathAnother(object):
 
 # Subclass for subtraction.
 @class_timer_another
-class MathAnotherSubSub(Math):
+class MathSubSubAnother(MathAnother):
   def __init__(self, *args, **kwargs):
     set_trace()
     print 'Inside MathAnother.__init__.'
     self._args = args
     self._kwargs = kwargs
-    super(MathAnother, self).__init__(*args, **kwargs)
+    super(MathSubSubAnother, self).__init__(*args, **kwargs)
   def sub(self, first, second):
     return first - second
 
+
+
+# Function replacing class approach?
+def decorator_with_args(check_in_list=None, short=False):
+  if check_in_list is None:
+    check_in_list = []
+
+  def bare_class_decorator(cls):
+
+    if short:
+      return cls
+
+    def overridden_getattribute(self, attr):
+      # Only works for class attrs and methods.
+      target = getattr(cls, attr)
+      if inspect.ismethod(target) and attr not in check_in_list:
+        return time_it(target)
+
+      return target
+
+    original_getattr = cls.__getattribute__
+    cls.__getattribute__ = overridden_getattribute
+
+    return cls
+  return bare_class_decorator
+
+
+@decorator_with_args()
+class MathFuncDeco(object):
+  def add(self, first, second):
+    return first + second
+
+
+# Subclass for subtraction.
+@decorator_with_args()
+class MathSubSubFuncDeco(MathFuncDeco):
+  def __init__(self, *args, **kwargs):
+    print 'Inside MathAnother.__init__.'
+    self._args = args
+    self._kwargs = kwargs
+    super(MathSubSubFuncDeco, self).__init__(*args, **kwargs)
+  def sub(self, first, second):
+    return first - second
 
 
 
