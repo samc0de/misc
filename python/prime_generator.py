@@ -6,24 +6,24 @@ import argparse
 LIMIT = 1e15
 
 
-def gen_primes(limit=LIMIT, primes=None):
+def gen_primes(start=3, limit=LIMIT, primes=None):
   """Generate primes.
 
   Args:
-    index: Index of prime number to generate, 1st one being 2.
+    start: Starting number, default is 2.
+
+    limit: Upper limit to find primes upto. Negative for infinite!
 
     primes: List of already known primes, also used as divisors.
 
   Returns:
     A generator that yields prime numbers.
   """
-  current_num = 2
-  while current_num < limit:
+  yield 2
+  current_num = 3
+  while current_num < limit or limit < 0:
     if primes == None:
-      # Special case handeling for efficiency. Enables increments by 2.
       primes = [2]  # Ordered container needed.
-      yield 2
-      current_num = 3
 
     for divisor in primes:
       if current_num % divisor == 0:
@@ -32,6 +32,7 @@ def gen_primes(limit=LIMIT, primes=None):
       yield current_num
       primes.append(current_num)  # Keeping after yield for priorities n fun.
 
+    # Special case handeling for efficiency. Enables increments by 2.
     current_num += 2
 
   print 'Upper limit reached!'  # Use logging here.
