@@ -1,7 +1,6 @@
 """Various ways of generating prime numbers."""
 
 import argparse
-from pdb import set_trace
 
 
 LIMIT = 1e15
@@ -21,9 +20,11 @@ def gen_primes(limit=LIMIT, primes=None):
   current_num = 2
   while current_num < limit:
     if primes == None:
-      primes = []  # Ordered container needed.
+      # Special case handeling for efficiency. Enables increments by 2.
+      primes = [2]  # Ordered container needed.
+      yield 2
+      current_num = 3
 
-    # set_trace()
     for divisor in primes:
       if current_num % divisor == 0:
         break
