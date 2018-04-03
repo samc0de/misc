@@ -24,7 +24,6 @@ if __name__ == '__main__':
   set_trace()
 
 
-
 # Conclusion:
 # Here 'BClass' is just a variable name, holding a reference to that class. The
 # actual classname however is 'AnotherClass'. We can import BClass name but the
