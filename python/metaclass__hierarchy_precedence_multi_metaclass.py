@@ -67,9 +67,29 @@ class MetaClass2(MetaClass):
     return super(MetaClass2, self).__call__(*args, **kwargs)
 
 
+class MetaClassInherited(MetaClass1, MetaClass2):
+  def __new__(cls, *args, **kwargs):
+    # Not sure what does this mean here.
+    # Try removing the cls from the super() args.
+    print('Inside __new__ of {0}.'.format(cls.__name__))
+    print('(=====================Actually in MetaClassInherited)')
+    return super(MetaClassInherited, cls).__new__(cls, *args, **kwargs)
+
+  def __init__(self, *args, **kwargs):
+    # Does MetaClasses have __init__s?
+    print('Inside __init__ of {0}.'.format(self.__class__.__name__))
+    print('(=====================Actually in MetaClassInherited)')
+    return super(MetaClassInherited, self).__init__(*args, **kwargs)
+
+  def __call__(self, *args, **kwargs):
+    print('Inside __call__ of {0}.'.format(self.__class__.__name__))
+    print('(=====================Actually in MetaClassInherited)')
+    return super(MetaClassInherited, self).__call__(*args, **kwargs)
+
+
 class Class1Level1(object):
   """A class at level 1 with __metaclass__ defined inside."""
-  __metaclass__ = MetaClass1
+  __metaclass__ = MetaClassInherited
   # set_in = Class1Level1
   Class1Level1 = True
 
@@ -90,7 +110,7 @@ class Class1Level1(object):
 
 class Class2Level1(object):
   """A class at level 1 without a __metaclass__ defined."""
-  __metaclass__ = MetaClass2
+  __metaclass__ = MetaClassInherited
   Class2Level1 = True
 
   def __new__(cls, *args, **kwargs):
@@ -176,3 +196,8 @@ if __name__ == '__main__':
 # Conclusion: It doesn't seem possible to have a diamond inheritance of
 # metaclasses. A class can have a metaclass only if that metaclass is a
 # (non-strict, indirect is ok) subclass of the class's parent's all metaclass.
+# One way to do it is to solve the inheritance confusion ourself, make a
+# subclass of the metaclasses, then use that subclass as a metaclass for both
+# classes which then can be used in inheritance.
+# This will be more interesting with module level metaclass, as there the
+# inheritance problem is not expected.
