@@ -98,13 +98,13 @@ class Class1Level2(Class1Level1):
     return super(Class1Level2, self).__init__(*arguments, **kwargs)
 
 
-class Class2Level2(Class1Level2):
+class Class2Level2(Class2Level1):
   """A level 2 class with meta class defined neither in it nor in a parent."""
   Class2Level2 = True
 
   def __new__(cls, *args, **kwargs):
     # Try removing the cls from the super() args.
-    print('Inside __new__ of {0}.',format(cls.__name__))
+    print('Inside __new__ of {0}.'.format(cls.__name__))
     print('(Actually in Class2Level2)')
     return super(Class2Level2, cls).__new__(cls, *args, **kwargs)
 
@@ -115,6 +115,44 @@ class Class2Level2(Class1Level2):
     self.kwargs = kwargs
     self.set_in = self.__class__.__name__
     return super(Class2Level2, self).__init__(*arguments, **kwargs)
+
+
+class Class3Level2(Class1Level1, Class2Level1):
+  """A level 2 class with a meta class defined in first of its parents."""
+  Class3Level2 = True
+
+  def __new__(cls, *args, **kwargs):
+    # Try removing the cls from the super() args.
+    print('Inside __new__ of {0}.'.format(cls.__name__))
+    print('(Actually in Class3Level2)')
+    return super(Class3Level2, cls).__new__(cls, *args, **kwargs)
+
+  def __init__(self, *arguments, **kwargs):
+    print('Inside __init__ of {0}.'.format(self.__class__.__name__))
+    print('(Actually in Class3Level2)')
+    self.arguments = arguments
+    self.kwargs = kwargs
+    self.set_in = self.__class__.__name__
+    return super(Class3Level2, self).__init__(*arguments, **kwargs)
+
+
+class Class4Level2(Class2Level1, Class1Level1):
+  """A level 2 class with a meta class defined in its second parent."""
+  Class4Level2 = True
+
+  def __new__(cls, *args, **kwargs):
+    # Try removing the cls from the super() args.
+    print('Inside __new__ of {0}.'.format(cls.__name__))
+    print('(Actually in Class4Level2)')
+    return super(Class4Level2, cls).__new__(cls, *args, **kwargs)
+
+  def __init__(self, *arguments, **kwargs):
+    print('Inside __init__ of {0}.'.format(self.__class__.__name__))
+    print('(Actually in Class4Level2)')
+    self.arguments = arguments
+    self.kwargs = kwargs
+    self.set_in = self.__class__.__name__
+    return super(Class4Level2, self).__init__(*arguments, **kwargs)
 
 
 if __name__ == '__main__':
