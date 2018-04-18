@@ -18,4 +18,6 @@ def palindrome_seq_matcher(string):
 
 
 # Interestingly both show pretty much the same efficiency.
+# The first approach uses short circuiting, so it seems that the string matching
+# uses it as well.
 
