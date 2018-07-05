@@ -1,8 +1,5 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
-
 import sys
 import time
 import multiprocessing
@@ -17,9 +14,9 @@ class MyProcess(multiprocessing.Process):
 
     def run(self):
         # Use click.echo.
-        print('Process id: %s started...' % self.id)
+        click.echo('Process id: %s started...' % self.id)
         time.sleep(self.delay)
-        print('Completed run of id: %s' % self.id)
+        click.echo('Completed run of id: %s' % self.id)
 
 
 
