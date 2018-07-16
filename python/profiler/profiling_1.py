@@ -72,10 +72,8 @@ def funcs_caller(num):
 @click.option('--mode', type=click.Choice(['time', 'memory']),
         prompt=True, default='memory')
 def profile_functions(num, mode='memory'):
-    if mode == 'memory':
-        mem_prof(funcs_caller)(num)
-    else:
-        time_prof('funcs_caller(num)', globals(), locals())
+    cmd = 'mem_prof(funcs_caller)(num)'
+    time_prof(cmd, globals(), locals())
 
 
 if __name__ == '__main__':
