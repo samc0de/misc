@@ -3,6 +3,7 @@
 import click
 import string
 from memory_profiler import profile as mem_prof
+from cProfile import runctx as time_prof
 
 
 def called(num):
@@ -62,8 +63,8 @@ def funcs_caller(num):
     slotted, vanilla, slotted_subclassed = [], [], []
     for count in xrange(num):
         slotted.append(AlphabeticAttributerSlotted())
-        vanilla.append(AlphabeticAttributerSlottedSubclass())
-        slotted_subclassed.append(AlphabeticAttributer())
+        # vanilla.append(AlphabeticAttributerSlottedSubclass())
+        # slotted_subclassed.append(AlphabeticAttributer())
 
 
 @click.command('profile')
@@ -71,10 +72,10 @@ def funcs_caller(num):
 @click.option('--mode', type=click.Choice(['time', 'memory']),
         prompt=True, default='memory')
 def profile_functions(num, mode='memory'):
-    profiler = mem_prof if mode == 'memory' else time_prof
-    # for func in funcs:
-    #     profiler(func)(num)
-    profiler(funcs_caller)(num)
+    if mode == 'memory':
+        mem_prof(funcs_caller)(num)
+    else:
+        time_prof('funcs_caller(num)', globals(), locals())
 
 
 if __name__ == '__main__':
