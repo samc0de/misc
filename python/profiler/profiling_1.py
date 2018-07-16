@@ -63,8 +63,17 @@ def funcs_caller(num):
     slotted, vanilla, slotted_subclassed = [], [], []
     for count in xrange(num):
         slotted.append(AlphabeticAttributerSlotted())
-        # vanilla.append(AlphabeticAttributerSlottedSubclass())
-        # slotted_subclassed.append(AlphabeticAttributer())
+        vanilla.append(AlphabeticAttributer())
+        slotted_subclassed.append(AlphabeticAttributerSlottedSubclass())
+    return slotted, vanilla, slotted_subclassed
+
+def timeit(cmd, local_dir=None):
+    global_dir = globals()
+    if local_dir:
+        local_dir = local_dir.update(locals())
+    else:
+        local_dir = locals()
+    time_prof(cmd, global_dir, local_dir)
 
 
 @click.command('profile')
@@ -72,7 +81,11 @@ def funcs_caller(num):
 @click.option('--mode', type=click.Choice(['time', 'memory']),
         prompt=True, default='memory')
 def profile_functions(num, mode='memory'):
-    cmd = 'mem_prof(funcs_caller)(num)'
+    slotted, vanilla, slotted_subclassed = mem_prof(funcs_caller)(num)
+    attr_vals = string.ascii_letters
+    cmd = '[setattr(a, x, x) for x in attr_vals for a in slotted]'
+    time_prof(cmd, globals(), locals())
+    cmd = '[setattr(a, x, x) for x in attr_vals for a in vanilla]'
     time_prof(cmd, globals(), locals())
 
 
