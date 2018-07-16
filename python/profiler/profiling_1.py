@@ -2,7 +2,7 @@
 
 import click
 import string
-from memory_profiler import profile
+from memory_profiler import profile as mem_prof
 
 
 def called(num):
@@ -21,12 +21,12 @@ def sum_filter_map(ip):
     return value
 def reduce_filter_map(ip):
     value = reduce(
-            lambda x, y: float(x + y), filter(lambda x: x%2 == 0, range(ip)))
+            lambda x, y: float(x + y), filter(lambda x: x % 2 == 0, range(ip)))
     return value
 
 
 pcalled, pcalled_gen, psum_filter_map, pmap_filter_map, preduce_filter_map = (
-        map(profile, [called, called_gen, map_filter_map, sum_filter_map,
+        map(mem_prof, [called, called_gen, map_filter_map, sum_filter_map,
             reduce_filter_map]))
 
 
@@ -51,8 +51,31 @@ class AlphabeticAttributerSlottedSubclass(AlphabeticAttributer):
                 self).__init__(values, debug)
 
 
-# @click.command('profile')
+def get_memory_profile(funcs, num):  # Generic args if needed.
+    # new_funcs = {f_name: mem_prof(func) for func in funcs}
+    # new_funcs = map(mem_prof, funcs)
+    for func in funcs:
+        mem_prof(func)(num)
+
+
+def funcs_caller(num):
+    slotted, vanilla, slotted_subclassed = [], [], []
+    for count in xrange(num):
+        slotted.append(AlphabeticAttributerSlotted())
+        vanilla.append(AlphabeticAttributerSlottedSubclass())
+        slotted_subclassed.append(AlphabeticAttributer())
+
+
+@click.command('profile')
+@click.argument('num', default=10000000)
+@click.option('--mode', type=click.Choice(['time', 'memory']),
+        prompt=True, default='memory')
+def profile_functions(num, mode='memory'):
+    profiler = mem_prof if mode == 'memory' else time_prof
+    # for func in funcs:
+    #     profiler(func)(num)
+    profiler(funcs_caller)(num)
+
+
 if __name__ == '__main__':
-    num = int(1e7)
-    pcalled_gen(num)
-    pcalled(num)
+    profile_functions()
