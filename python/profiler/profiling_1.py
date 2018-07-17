@@ -3,6 +3,7 @@
 import click
 import string
 from memory_profiler import profile as mem_prof
+# from line_profiler import profile as lprof
 from cProfile import runctx as time_prof
 
 
@@ -32,6 +33,7 @@ pcalled, pcalled_gen, psum_filter_map, pmap_filter_map, preduce_filter_map = (
 
 
 class AlphabeticAttributer(object):
+    @profile  # Injected by kernprof line_profiler.
     def __init__(self, values=string.ascii_letters, debug=False):
         if debug:
             set_trace()
@@ -40,12 +42,15 @@ class AlphabeticAttributer(object):
 
 class AlphabeticAttributerSlotted(object):
     __slots__ = tuple(string.ascii_letters)
+
+    @profile
     def __init__(self, values=string.ascii_letters):
         [setattr(self, x, x + x) for x in values]
         return super(AlphabeticAttributerSlotted, self).__init__()
 
 class AlphabeticAttributerSlottedSubclass(AlphabeticAttributer):
     __slots__ = tuple(string.ascii_letters)
+
     def __init__(self, values=string.ascii_letters, debug=False):
         [setattr(self, x + x, x + x + x) for x in values]
         return super(AlphabeticAttributerSlottedSubclass,
@@ -59,12 +64,13 @@ def get_memory_profile(funcs, num):  # Generic args if needed.
         mem_prof(func)(num)
 
 
+@profile
 def funcs_caller(num):
     slotted, vanilla, slotted_subclassed = [], [], []
     for count in xrange(num):
         slotted.append(AlphabeticAttributerSlotted())
         vanilla.append(AlphabeticAttributer())
-        slotted_subclassed.append(AlphabeticAttributerSlottedSubclass())
+        # slotted_subclassed.append(AlphabeticAttributerSlottedSubclass())
     return slotted, vanilla, slotted_subclassed
 
 def timeit(cmd, local_dir=None):
@@ -80,13 +86,18 @@ def timeit(cmd, local_dir=None):
 @click.argument('num', default=10000000)
 @click.option('--mode', type=click.Choice(['time', 'memory']),
         prompt=True, default='memory')
+@profile
 def profile_functions(num, mode='memory'):
-    slotted, vanilla, slotted_subclassed = mem_prof(funcs_caller)(num)
-    attr_vals = string.ascii_letters
-    cmd = '[setattr(a, x, x) for x in attr_vals for a in slotted]'
-    time_prof(cmd, globals(), locals())
-    cmd = '[setattr(a, x, x) for x in attr_vals for a in vanilla]'
-    time_prof(cmd, globals(), locals())
+    # slotted, vanilla, slotted_subclassed = mem_prof(funcs_caller)(num)
+    slotted, vanilla, slotted_subclassed = funcs_caller(num)
+    if mode == 'memory':
+        slotted, vanilla, slotted_subclassed = mem_prof(funcs_caller)(num)
+    else:
+        attr_vals = string.ascii_letters
+        cmd = '[setattr(a, x, x) for x in attr_vals for a in slotted]'
+        time_prof(cmd, globals(), locals())
+        cmd = '[setattr(a, x, x) for x in attr_vals for a in vanilla]'
+        time_prof(cmd, globals(), locals())
 
 
 if __name__ == '__main__':
