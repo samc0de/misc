@@ -48,19 +48,52 @@ from itertools import product
 DATE_FORMAT = '%Y%m%d%H%m'
 SEPARATOR = '_'
 DATE = datetime.today().strftime(DATE_FORMAT)
-# BASE_DIR = os_path.curdir
 # See time performance of repeated dir-creation calls, as this approach avoids
 # that but at the cost of bad memory performance, two diff objects hold data
 # with similar data (paths and tree).
+# %timeit org.organise_files(input_dirs)
+# 246 µs ± 71.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+#
+# Files created using:
+#  tasks = ['TT' + str(x) for x in range(4)]
+# 
+#  projs = ['P1', 'P22', 'P3', 'P2']
+# 
+#  shots = ['S' + str(x) for x in range(2, 7)]
+# 
+#  tasks = ['TT' + str(x) for x in range(2, 5)]
+# 
+#  base_dir = 'ip_1/'
+# 
+#  base_dir = 'ip_2/'
+# 
+#  for p, t, s, e in product(projs, tasks, shots, ftypes):
+#      for num in range(4):
+#          fl_name = '_'.join((p, s, '.'.join((t, '000%d' % num, e))))
+#          with open(base_dir + fl_name, 'wt') as fl:
+#              fl.write('')
+# 
+#  projs = ['P1', 'P2', 'P3']
+# 
+#  tasks = ['T' + str(x) for x in range(4)]
+# 
+#  shots = ['S' + str(x) for x in range(4)]
+# 
+#  base_dir = 'ip_1/'
+# 
+#  for p, t, s, e in product(projs, tasks, shots, ftypes):
+#      for num in range(4):
+#          fl_name = '_'.join((p, s, '.'.join((t, '000%d' % num, e))))
+#          with open(base_dir + fl_name, 'wt') as fl:
+#              fl.write('')
+# For 2 dirs: input_dirs = ['ip_1/', 'ip_2/']
+# 
+# %timeit org.organise_files(input_dirs, out_dir='../out/')
+# 101 µs ± 49.7 µs per loop (mean ± std. dev. of 7 runs, 1 loop each)
 # Also json object to be created.
 
-from ipdb import set_trace
 
-def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
-    """Organise files as per above documented pattern."""
-    # base_output_path
-    # Read input dir.
-    # def get_file_identifiers()
+def get_file_identifiers(input_dirs, base_path):
     projects, tasks, shots, exts, paths = set(), set(), set(), set(), {}
     for input_dir in input_dirs:
         path = pathlib.Path(base_path, input_dir)
@@ -70,7 +103,7 @@ def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
                 project, shot, task = file_name.split(SEPARATOR)
             except ValueError as e:
                 logging.warning('{} does not comply with filename standard.'
-                        'Ignoring it....'.format(file.name))
+                        'Ignoring it....'.format(file))
                 logging.debug(e)
                 continue
             projects.add(project)
@@ -78,16 +111,8 @@ def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
             shots.add(shot)
             exts.add(ext)
             paths[file] = (project, shot, task, ext)
-    # Create dir struct.
-    # if not tree:
-    # Abort in case if dirs can't be created. Exception raised.
-    tree = create_dir_tree(path, projects, date, shots, tasks, exts)
-    # Move files.
-    for file, identifiers in paths.items():
-        # file.rename(tree[(project, shot, task, ext)])
-        # set_trace()
-        target = tree[identifiers]
-        file.rename(target / file.name)
+    return paths, projects, tasks, shots, exts
+
 
 def create_dir_tree(path, projects, date, shots, tasks, exts):
     """Create a directory tree as per above documantation with given params."""
@@ -101,10 +126,20 @@ def create_dir_tree(path, projects, date, shots, tasks, exts):
                 task,
                 ext.upper())
         leaf_dir.mkdir(parents=True, exist_ok=True)
-        # set_trace()
         output_tree[(project, shot, task, ext)] = leaf_dir
     return output_tree
 
 
-def get_or_create(path):
-    """Create"""
+def organise_files(input_dirs, out_dir, date=DATE, base_path=os_path.curdir):
+    """Organise files as per above documented pattern."""
+    # Read input dir.
+    paths, projects, tasks, shots, exts = get_file_identifiers(
+            input_dirs, base_path)
+    # Create dir struct.
+    out_path = pathlib.Path(base_path, out_dir)
+    # Abort in case if dirs can't be created. Exception raised.
+    tree = create_dir_tree(out_path, projects, date, shots, tasks, exts)
+    # Move files.
+    for file, identifiers in paths.items():
+        target = tree[identifiers]
+        file.rename(target / file.name)
