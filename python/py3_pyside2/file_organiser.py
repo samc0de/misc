@@ -54,6 +54,8 @@ DATE = datetime.today().strftime(DATE_FORMAT)
 # with similar data (paths and tree).
 # Also json object to be created.
 
+from ipdb import set_trace
+
 def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
     """Organise files as per above documented pattern."""
     # base_output_path
@@ -73,6 +75,7 @@ def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
                 continue
             projects.add(project)
             tasks.add(task)
+            shots.add(shot)
             exts.add(ext)
             paths[file] = (project, shot, task, ext)
     # Create dir struct.
@@ -82,23 +85,24 @@ def organise_files(input_dirs, date=DATE, base_path=os_path.curdir):
     # Move files.
     for file, identifiers in paths.items():
         # file.rename(tree[(project, shot, task, ext)])
+        # set_trace()
         target = tree[identifiers]
-        file.rename(target, file)
+        file.rename(target / file.name)
 
-
-def create_dir_tree(path, projects, date, shots, tasks, extensions):
+def create_dir_tree(path, projects, date, shots, tasks, exts):
     """Create a directory tree as per above documantation with given params."""
     project_paths = {p: pathlib.Path(path, p, date) for p in projects}
-    _ = [p.mkdir(exists_ok=True) for p in project_paths.values()]
+    _ = [p.mkdir(parents=True, exist_ok=True) for p in project_paths.values()]
     output_tree = {}
-    for project, shot, task, ext in product(projects, tasks, shots, exts):
+    for project, shot, task, ext in product(projects, shots, tasks, exts):
         leaf_dir = pathlib.Path(
                 project_paths[project],
                 SEPARATOR.join((project, shot)),
                 task,
-                ext)
-        leaf_dir.mkdir(parents=True, exists_ok=True)
-        output_tree[(project, shot, task, ext)] = leaf_dir.name
+                ext.upper())
+        leaf_dir.mkdir(parents=True, exist_ok=True)
+        # set_trace()
+        output_tree[(project, shot, task, ext)] = leaf_dir
     return output_tree
 
 
