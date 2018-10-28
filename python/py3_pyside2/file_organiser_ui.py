@@ -2,40 +2,10 @@ import os, sys
 from PySide2 import QtCore, QtGui, QtWidgets, QtUiTools
 
 
-class AppWindow(QtWidgets.QWidget):
+class AppWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__()
-        self.input_files = QtWidgets.QFileDialog
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    sys.exit(app.exec_())
-
-def load_ui(file_name, where=None):
-    """
-    Loads a .UI file into the corresponding Qt Python object
-    :param file_name: UI file path
-    :param where: Use this parameter to load the UI into an existing class (i.e. to override methods)
-    :return: loaded UI
-    """
-    # Create a QtLoader
-    loader = QtUiTools.QUiLoader()
-
-    # Open the UI file
-    ui_file = QtCore.QFile(file_name)
-    ui_file.open(QtCore.QFile.ReadOnly)
-
-    # Load the contents of the file
-    ui = loader.load(ui_file, where)
-
-    # Close the file
-    ui_file.close()
-
-    return ui
-
-class PCBOutlineCreator(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        # self.input_files = QtWidgets.QFileDialog
         self.setupUI()
         self.resetValues()
 
@@ -48,35 +18,42 @@ class PCBOutlineCreator(QtWidgets.QWidget):
         layout.addWidget(main_widget)
         self.setLayout(layout)
 
-
         # Get a reference to all required widgets
-        self.inputFileButton = self.findChild(QtGui.QToolButton, 'inputFileButton')
-        self.inputFileLineEdit = self.findChild(QtGui.QLineEdit, 'inputFileLineEdit')
-        self.exportButton = self.findChild(QtGui.QPushButton, 'exportButton')
-        self.saveButton = self.findChild(QtGui.QPushButton, 'saveButton')
-        self.lengthSpinBox = self.findChild(QtGui.QDoubleSpinBox, 'lengthSpinBox')
-        self.widthSpinBox = self.findChild(QtGui.QDoubleSpinBox, 'widthSpinBox')
-        self.lineWidthSpinBox = self.findChild(QtGui.QDoubleSpinBox, 'lineWidthSpinBox')
-        self.cornersSpinBox = self.findChild(QtGui.QDoubleSpinBox, 'cornersSpinBox')
-        self.cornersCheckBox = self.findChild(QtGui.QCheckBox, 'cornersCheckBox')
-        self.xSpinBox = self.findChild(QtGui.QDoubleSpinBox, 'xSpinBox')
-        self.ySpinBox = self.findChild(QtGui.QDoubleSpinBox, 'ySpinBox')
+        self.input_file_edit = self.findChild(QtWidgets.QLineEdit, 'InputLineEdit')
+        # self.input_button = self.findChild(QtGui.QToolButton, 'InputFileButton')
+        self.input_button = self.findChild(QtWidgets.QPushButton, 'InputFileButton')
+        self.output_file_edit = self.findChild(QtWidgets.QLineEdit, 'OutputLineEdit')
+        self.output_button = self.findChild(QtWidgets.QPushButton, 'inputFileButton')
+        self.execute_button = self.findChild(QtWidgets.QPushButton, 'ExecuteButton')
+        self.cancel_button = self.findChild(QtWidgets.QPushButton, 'CancelButton')
 
-        # Configure widget ranges:
-        max_float = sys.float_info.max
-        self.lengthSpinBox.setMinimum(0)
-        self.lengthSpinBox.setMaximum(max_float)
-        self.widthSpinBox.setMinimum(0)
-        self.widthSpinBox.setMaximum(max_float)
-        self.lineWidthSpinBox.setMinimum(0)
-        self.lineWidthSpinBox.setMaximum(max_float)
-        self.lineWidthSpinBox.setSingleStep(0.1)
-        self.cornersSpinBox.setMinimum(0)
-        self.cornersSpinBox.setMaximum(max_float)
-        self.xSpinBox.setMinimum(-max_float)
-        self.xSpinBox.setMaximum(max_float)
-        self.ySpinBox.setMinimum(-max_float)
-        self.ySpinBox.setMaximum(max_float)
+        # Connect slots/callbacks and signals
+        self.execute_button.setEnabled(False)
+        self.cornersCheckBox.stateChanged.connect(self.onCornersCheckBoxChangedState)
+        self.saveButton.clicked.connect(self.onSaveButtonClicked)
+        self.inputFileButton.clicked.connect(self.onInputFileButtonClicked)
+        self.exportButton.clicked.connect(self.onExportButtonClicked)
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    sys.exit(app.exec_())
+
+def load_ui(file_name, where=None):
+    """
+    Loads a .UI file into the corresponding Qt Python object
+    :param file_name: UI file path
+    :param where: Use this parameter to load the UI into an existing class (i.e. to override methods)
+    :return: loaded UI
+    """
+    loader = QtUiTools.QUiLoader()
+    ui_file = QtCore.QFile(file_name)
+    ui_file.open(QtCore.QFile.ReadOnly)
+    ui = loader.load(ui_file, where)
+    ui_file.close()
+    return ui
+
+class PCBOutlineCreator(QtWidgets.QWidget):
 
         # Connect slots/callbacks and signals
         self.cornersSpinBox.setEnabled(False)
@@ -84,16 +61,6 @@ class PCBOutlineCreator(QtWidgets.QWidget):
         self.saveButton.clicked.connect(self.onSaveButtonClicked)
         self.inputFileButton.clicked.connect(self.onInputFileButtonClicked)
         self.exportButton.clicked.connect(self.onExportButtonClicked)
-
-
-    def resetValues(self):
-        self.lengthSpinBox.setValue(50)
-        self.widthSpinBox.setValue(50)
-        self.lineWidthSpinBox.setValue(0.2)
-        self.cornersCheckBox.setChecked(False)
-        self.cornersSpinBox.setValue(5)
-        self.xSpinBox.setValue(0)
-        self.ySpinBox.setValue(0)
 
     def onCornersCheckBoxChangedState(self, checked):
         self.cornersSpinBox.setEnabled(bool(checked))
