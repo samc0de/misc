@@ -52,3 +52,49 @@ def vatApplier(vat: Double) = {  // Not specifying return type.
 def vatSTApplier(serviceTax: Double) = vatApplier(serviceTax) _
 
 def taxesApplier(vat: Double)(serviceTax: Double) = totalPrice(vat)(serviceTax) _
+
+
+// Variable length args.
+def capitalizeAll(args: String*) = {
+  args.map(arg => arg.capitalize)
+}
+
+
+// Classes and objects.
+class CasioCalculator {
+  var brand: String = "Casio"
+  def add (m: Int, n: Int) = a + b
+}
+
+// Class with a constructor.
+class Calculator(brand: String) {  // brand is not stored, unless explicitly done.
+  /**
+   * A Constructor.
+   */  // Note comment styles, like c++.
+  val colour: String = if (brand == "CASIO") {  // Expression.
+    "blue"
+  } else if (brand == "HP") {
+    "green"
+  } else if (brand == "TI") {
+    "black"
+  } else "white"
+  def add(a: Double, b: Double): Double = a + b
+}
+
+//
+class ScientificCalc(baseIn: Double) extends Calculator("CASIO") {
+  val base = baseIn
+  // Would be overridden in subclasses.
+  def log(m: Int): Double = math.log(m) / math.log(base)  // How to default args?
+}
+
+// class MoreSciCalc extends ScientificCalc
+
+// Abstract classes.
+abstract class Geometry {
+  def getArea(): Double  // Subclass to define this.
+}
+
+class Circle(r: Double) extends Geometry {
+  def getArea(): Double = { r * r * 3.1415 }
+}
