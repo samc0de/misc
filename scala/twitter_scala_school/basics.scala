@@ -98,3 +98,33 @@ abstract class Geometry {
 class Circle(r: Double) extends Geometry {
   def getArea(): Double = { r * r * 3.1415 }
 }
+
+
+// Traits.
+trait Car {
+  val brand: String
+}
+
+trait Sedan {
+  val doorCount: Int
+}
+
+class BMW extends Car with Sedan {  // Notice 'with'.
+  val brand = "BMW"
+  val doorCount = 2
+}  // Order of traits doesn't seem to matter as of now, check 4 commonn names.
+
+// Similar to java interfaces (abstract base classes in python, they have only
+// func signatures, not bodies.) traits seem to be. For interfaces, if a class
+// extends an interface, and doesn't have all of its methods, that class must
+// be declared as an abstract class.
+//
+//
+// Though similar to abstract base classes, traits have some differences so use
+// cases dictate what to use among trait or abstract class:
+// Traits can't take params (for constructors). So if that's needed, the
+//   abstract classes is the way to go.
+// Traits allow multiple extensions (inheritance), only one class can be
+//   extended.
+//
+// TODO: Types section is very unclear, need to learn that from somewhere else.
