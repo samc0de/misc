@@ -128,3 +128,9 @@ class BMW extends Car with Sedan {  // Notice 'with'.
 //   extended.
 //
 // TODO: Types section is very unclear, need to learn that from somewhere else.
+
+
+// Misc, learnt from other egs during this.
+val variable = "Actual Value."
+
+s"Value is $variable."  // Here interpolation works only when string is s"".
