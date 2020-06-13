@@ -14,3 +14,7 @@ def get_multiples(root_factors, limit):
                 break
 
     return multiples
+
+
+def get_sum_of_devisors(root_factors, limit):
+    return sum(get_multiples(root_factors, limit))
