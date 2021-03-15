@@ -1,0 +1,10 @@
+{"compile":[
+["/home/seneca/work/misc/nim/nimcache/g_hello.c", "gcc -c  -w -Os  -I/usr/lib/nim -o /home/seneca/work/misc/nim/nimcache/g_hello.o /home/seneca/work/misc/nim/nimcache/g_hello.c"],
+["/home/seneca/work/misc/nim/nimcache/stdlib_system.c", "gcc -c  -w -Os  -I/usr/lib/nim -o /home/seneca/work/misc/nim/nimcache/stdlib_system.o /home/seneca/work/misc/nim/nimcache/stdlib_system.c"]
+],
+"link":[
+"/home/seneca/work/misc/nim/nimcache/g_hello.o",
+"/home/seneca/work/misc/nim/nimcache/stdlib_system.o"
+],
+"linkcmd": "gcc   -o /home/seneca/work/misc/nim/g_hello  /home/seneca/work/misc/nim/nimcache/g_hello.o /home/seneca/work/misc/nim/nimcache/stdlib_system.o   -s  -ldl"
+}
